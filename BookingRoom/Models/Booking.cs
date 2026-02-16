@@ -26,4 +26,6 @@ public class Booking
 
     [StringLength(255)]
     public string? Purpose { get; set; }
+
+    
 }

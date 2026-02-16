@@ -23,6 +23,18 @@ public class BookingsController : ControllerBase
         if (booking.EndTime <= booking.StartTime)
             return BadRequest("EndTime must be after StartTime.");
 
+        // 🔥 VALIDASI BENTROK RUANGAN
+        var conflict = await _db.Bookings.AnyAsync(b =>
+            b.RoomName == booking.RoomName &&
+            booking.StartTime < b.EndTime &&
+            booking.EndTime > b.StartTime
+        );
+
+        if (conflict)
+        {
+            return BadRequest("Room already booked at that time");
+        }
+
         booking.Status = string.IsNullOrWhiteSpace(booking.Status) ? "pending" : booking.Status;
 
         _db.Bookings.Add(booking);
@@ -30,6 +42,7 @@ public class BookingsController : ControllerBase
 
         return CreatedAtAction(nameof(GetBookingById), new { id = booking.Id }, booking);
     }
+
 
     // READ (Detail) - dipakai buat CreatedAtAction
     [HttpGet("{id:int}")]
