@@ -72,5 +72,17 @@ public class BookingsController : ControllerBase
         return Ok(booking);
     }
 
+    // DELETE
+    [HttpDelete("{id:int}")]
+    public async Task<ActionResult> DeleteBooking(int id)
+    {
+        var booking = await _db.Bookings.FirstOrDefaultAsync(b => b.Id == id);
+        if (booking == null) return NotFound();
+
+        _db.Bookings.Remove(booking);
+        await _db.SaveChangesAsync();
+
+        return Ok("Deleted");
+    }
 
 }
