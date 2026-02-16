@@ -50,4 +50,27 @@ public class BookingsController : ControllerBase
         return Ok(bookings);
     }
 
+    // UPDATE
+    [HttpPut("{id:int}")]
+    public async Task<ActionResult<Booking>> UpdateBooking(int id, [FromBody] Booking updated)
+    {
+        var booking = await _db.Bookings.FirstOrDefaultAsync(b => b.Id == id);
+        if (booking == null) return NotFound();
+
+        if (updated.EndTime <= updated.StartTime)
+            return BadRequest("EndTime must be after StartTime.");
+
+        booking.BorrowerName = updated.BorrowerName;
+        booking.RoomName = updated.RoomName;
+        booking.StartTime = updated.StartTime;
+        booking.EndTime = updated.EndTime;
+        booking.Status = string.IsNullOrWhiteSpace(updated.Status) ? booking.Status : updated.Status;
+        booking.Purpose = updated.Purpose;
+
+        await _db.SaveChangesAsync();
+
+        return Ok(booking);
+    }
+
+
 }
